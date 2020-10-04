@@ -1,8 +1,8 @@
 // Pre-requirements
-const path = require('path');
+import path from 'path';
 // External requirements
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
+import grpc from 'grpc';
+import protoLoader from '@grpc/proto-loader';
 
 // Load gRPC protobuf
 const path_trojan = path.join('protos', 'trojan.proto');

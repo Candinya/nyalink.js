@@ -1,17 +1,17 @@
 // Pre-requirements
-const fs = require('fs');
-const os = require('os');
+import fs from 'fs';
+import os from 'os';
 // External requirements
-const yaml = require('js-yaml');
+import yaml from 'js-yaml';
 
 // Load related function files
-import { webApi_SSPanel } from 'nyalink-webapi';
-import { gRpc_TrojanGo } from 'nyalink-grpc';
+import { webApi_SSPanel } from './nyalink-webapi.js';
+import { gRpc_TrojanGo } from './nyalink-grpc.js';
 
 // Load configurations
 const confContents = fs.readFileSync('config.yml', 'utf8');
 const confData = yaml.safeLoad(confContents);
-console.log('Config data load successfully...');
+console.log(confData.debugMode ? confData : 'Config data load successfully...');
 
 // Define panel webApi constant
 let panel;

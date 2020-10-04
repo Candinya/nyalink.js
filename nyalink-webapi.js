@@ -1,5 +1,5 @@
 // External requirements
-const got = require('got');
+import got from 'got';
 
 export class webApi_SSPanel {
     // Inner member variables
