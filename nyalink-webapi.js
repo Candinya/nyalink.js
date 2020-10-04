@@ -12,10 +12,12 @@ export class webApi_SSPanel {
     }
     getUsers(panelNodeId, progNodeId, userListCallback) {
         const panelApi = `${this.urlBase}/users?node_id=${panelNodeId}&key=${this.key}`;
+        console.log(panelApi);
         got(panelApi)
             .then((res) => {
-                return res.json();
+                return JSON.parse(res.body);
             }).then((data) => {
+                console.log(data);
                 if (data.ret === 1) {
                     userListCallback(data.data, progNodeId);
                 } else {
@@ -38,6 +40,6 @@ export class webApi_SSPanel {
         };
         got.post(panelApi, {
             json: serverLoad
-        }).then(console.log);
+        }).catch(console.log);
     }
 }

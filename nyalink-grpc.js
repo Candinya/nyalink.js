@@ -7,7 +7,7 @@ import protoLoader from '@grpc/proto-loader';
 // Load gRPC protobuf
 const path_trojan = path.join('protos', 'trojan.proto');
 const proto_trojan = protoLoader.loadSync(path_trojan);
-const grpc_trojan = grpc.loadPackageDefinition(proto_trojan);
+const grpc_trojan = grpc.loadPackageDefinition(proto_trojan).trojan.api;
 
 export class gRpc_TrojanGo {
     conn;
