@@ -1,0 +1,16 @@
+interv: # Event Interval (seconds)
+  getUser: 30
+  reportLoads: 15
+panel: # Your front-end panel configs
+  type: sspanel
+  addr: https://example.com
+  key: 123456
+nodes: # Your backend nodes
+  - type: trojan
+    id: 3
+    apiAddr: 127.0.0.1
+    apiPort: 10001
+  - type: trojan
+    id: 5
+    apiAddr: 127.0.0.1
+    apiPort: 10002

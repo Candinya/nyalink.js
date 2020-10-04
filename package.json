@@ -1,0 +1,31 @@
+{
+  "name": "nyalink.js",
+  "version": "1.0.0",
+  "description": "A Node.JS middleware connecting VPN Panels with backend servers.",
+  "main": "nyalink.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyawork/nyalink.js.git"
+  },
+  "keywords": [
+    "trojan",
+    "trojan-go",
+    "nodejs",
+    "grpc"
+  ],
+  "author": "Candinya",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/nyawork/nyalink.js/issues"
+  },
+  "homepage": "https://github.com/nyawork/nyalink.js#readme",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.5",
+    "got": "^11.7.0",
+    "grpc": "^1.24.3",
+    "js-yaml": "^3.14.0"
+  }
+}
