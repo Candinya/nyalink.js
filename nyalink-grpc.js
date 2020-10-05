@@ -18,11 +18,12 @@ export class gRpc_TrojanGo {
     listUsers(panelUsers, node, callBackFunc) {
         const userList = [];
         const uStream = this.conn.ListUsers();
-        uStream.on('data', (u) => {
+        uStream.on('data', (usr) => {
+            const u = usr.status;
             const beUser = {
                 sha224uuid: u.user.hash,
-                upload: u.traffic_total.upload_traffic,
-                download: u.traffic_total.download_traffic,
+                upload: u.trafficTotal.uploadTraffic,
+                download: u.trafficTotal.downloadTraffic,
                 raw: u
             };
             userList.push(beUser);
@@ -56,10 +57,23 @@ export class gRpc_TrojanGo {
             status: newUser,
             operation: 0 // Add
         };
-        this.conn.SetUsers(req, (err, res) => {
+        this.modifyUser(req);
+    }
+    modifyUser(req) {
+        const dataStream = this.conn.SetUsers((err, res) => {
             if (err) {
                 throw err;
             }
+        });
+        dataStream.write(req);
+        dataStream.end();
+        dataStream.on('data', (res) => {
+            if (!res.success) {
+                throw res.info;
+            }
+        });
+        dataStream.on('end', () => {
+            // User Add / Delete / Modify success
         });
     }
     delUser(uraw) {
@@ -67,23 +81,15 @@ export class gRpc_TrojanGo {
             status: uraw,
             operation: 1 // Delete
         };
-        this.conn.SetUsers(req, (err, res) => {
-            if (err) {
-                throw err;
-            }
-        });
+        this.modifyUser(req);
     }
     resetTraffic(uraw) {
-        uraw.traffic_total.upload_traffic = 0;
-        uraw.traffic_total.download_traffic = 0;
+        uraw.trafficTotal.uploadTraffic = 0;
+        uraw.trafficTotal.downloadTraffic = 0;
         const req = {
             status: uraw,
             operation: 2 // Modify
         };
-        this.conn.SetUsers(req, (err, res) => {
-            if (err) {
-                throw err;
-            }
-        });
+        this.modifyUser(req);
     }
 }

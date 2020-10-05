@@ -104,10 +104,13 @@ dist
 .tern-port
 
 # JetBrains
-.idea
+.idea/
 
 # Function test
-test
+test/
 
 # Configuration
 config.yml
+
+# Trojan-Go
+trojan-go/
