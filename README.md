@@ -2,10 +2,6 @@
 
 > A Node.JS middleware connecting Airport(VPN) Panels with backend servers.
 
-## Just finish building the framework and this is only for saving the working dir. There's much more waiting to be done... 
-
-<!--
-
 **Using gRPC Protocol.**
 
 Inspired by [yahagi.js](https://github.com/trojan-cluster/yahagi.js)
