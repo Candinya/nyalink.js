@@ -28,5 +28,8 @@
     "got": "^11.7.0",
     "grpc": "^1.24.3",
     "js-yaml": "^3.14.0"
+  },
+  "devDependencies": {
+    "grpc-tools": "^1.9.1"
   }
 }

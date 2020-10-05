@@ -23,8 +23,20 @@ export class webApi_SSPanel {
                 }
             }).catch(console.log);
     }
-    reportTraffic(panelNodeId, trafficLogSet) {
+    reportTraffic(panelNodeId, trafficSet) {
         const panelApi = `${this.urlBase}/users/traffic?node_id=${panelNodeId}&key=${this.key}`;
+
+        const trafficLogSet = {
+            data: []
+        };
+        trafficSet.forEach((u) => {
+            const newLog = {
+                'u': u.ul,
+                'd': u.dl,
+                'user_id': u.id,
+            };
+            trafficLogSet.data.push(newLog);
+        });
 
         got.post(panelApi, {
             json: trafficLogSet

@@ -53,7 +53,7 @@ const scheduleReport = () => {
     setInterval(getUsers, confData.interv.getUser * 1000);
     setInterval(reportLoads, confData.interv.reportLoads * 1000);
     console.log('Schedule setup.');
-}
+};
 
 /**
  * @method Get user list for all nodes
@@ -61,9 +61,9 @@ const scheduleReport = () => {
 const getUsers = () => {
     console.log('Start loading panel users...');
     nodes.forEach((node, no) => {
-        panel.getUsers(node.panelId, no, userListCallback);
+        panel.getUsers(node.panelId, no, panelUserListCallback);
     });
-}
+};
 
 /**
  * @method Get the id of a user (provided by panel) or 0 (if not found)
@@ -81,101 +81,75 @@ const getUserId = (panelUsers, sha224uuid) => {
     });
     // Not found
     return {userId: 0, uidInList: 0};
-}
+};
 
 /**
  * @method After got user list for a specify node
  * @param panelUsers {Array} List of users responded by panel
  * @param node {Int8Array} Node ID in this running progress (NOT in panel)
  */
-const userListCallback = (panelUsers, node) => {
+const panelUserListCallback = (panelUsers, node) => {
     console.log('Panel users loaded.');
     confData.debugMode ? console.log(panelUsers) : {};
     // Get backend users list
     console.log('Start loading backend users...');
-    const backendUserRequest = nodes[node].gRpc.listUsers();
-    const backendUserList = [];
-    backendUserRequest.on('data', (u) => {
-        backendUserList.push(u);
-    });
-    backendUserRequest.on('end', () => {
-        console.log('Backend users loaded.');
-        confData.debugMode ? console.log(backendUserList) : {};
-        const trafficLogSet = {
-            data: []
-        };
-        console.log('Start checking users...');
-        backendUserList.forEach((u) => {
-            const uidpos = getUserId(panelUsers, u.user.hash);
-            if (uidpos.userId !== 0 && (u.traffic_total.upload_traffic !== 0 || u.traffic_total.download_traffic !== 0)) {
-                // Ready to report traffic
-                confData.debugMode || console.log(`User ${panelUsers[uidpos].userId} (${panelUsers[uidpos].email}) exists, uploading traffic...`);
-                trafficLogSet.data.push({
-                    'u': u.traffic_total.upload_traffic,
-                    'd': u.traffic_total.download_traffic,
-                    'user_id': uidpos.userId,
-                });
-                // Reset traffic
-                confData.debugMode || console.log(`Traffic ready to push, resetting local records...`);
-                u.traffic_total.upload_traffic = 0;
-                u.traffic_total.download_traffic = 0;
-                nodes[node].gRpc.setUsers({
-                    status: u,
-                    operation: 2 // Modify
-                });
-                // Delete after use
-                confData.debugMode || console.log(`Traffic reset finish, ready to clean...`);
-                panelUsers.splice(uidpos.uidInList, 1);
-                confData.debugMode || console.log(`Done for ${panelUsers[uidpos].userId}!`);
-            } else {
-                // If non-exists => delete record
-                confData.debugMode || console.log(`User ${u.user.hash} shouldn't be here, ready to clean...`);
-                nodes[node].gRpc.setUsers({
-                    status: u,
-                    operation: 1 // Delete
-                })
-                confData.debugMode || console.log(`Done!`);
-            }
-        });
+    nodes[node].gRpc.listUsers(panelUsers, node, backendUserListCallback);
+};
 
-        // Report traffic
-        console.log('Reporting traffic...');
-        panel.reportTraffic(nodes[node].panelId, trafficLogSet);
-
-        // Add new user
-        panelUsers.forEach((u) => {
-            // Not deleted
-            confData.debugMode || console.log(`User ${u.userId} (${u.email}) shown up! Preparing...`);
-            const newUser = {
-                user: {
-                    password: u.uuid,
-                    hash: u.sha224uuid
-                },
-                traffic_total: {
-                    upload_traffic: 0,
-                    download_traffic: 0
-                },
-                speed_current: {
-                    upload_speed: 0,
-                    download_speed: 0
-                },
-                speed_limit: {
-                    upload_speed: u.node_speedlimit,
-                    download_speed: u.node_speedlimit
-                },
-                ip_current: 0,
-                ip_limit: u.node_connector
-            };
-            nodes[node].gRpc.setUsers({
-                status: newUser,
-                operation: 0 // Add
+/**
+ * @method After got user list for a specify node
+ * @param panelUsers {Array} List of users responded by panel
+ * @param backendUserList {Array} List of users responded by backend
+ * @param node {Int8Array} Node ID in this running progress (NOT in panel)
+ */
+const backendUserListCallback = (panelUsers, node, backendUserList) => {
+    console.log('Backend users loaded.');
+    confData.debugMode ? console.log(backendUserList) : {};
+    const trafficSet = [];
+    console.log('Start checking users...');
+    backendUserList.forEach((u) => {
+        const uidpos = getUserId(panelUsers, u.sha224uuid);
+        if (uidpos.userId !== 0 && (u.upload !== 0 || u.download !== 0)) {
+            // Ready to report traffic
+            confData.debugMode || console.log(`User ${panelUsers[uidpos].userId} (${panelUsers[uidpos].email}) exists, uploading traffic...`);
+            trafficSet.push({
+                ul: u.upload,
+                dl: u.download,
+                id: uidpos.userId
             });
-            confData.debugMode || console.log(`Done for ${u.userId}!`);
-        });
-
+            // Reset traffic
+            confData.debugMode || console.log(`Traffic ready to push, resetting local records...`);
+            nodes[node].gRpc.resetTraffic(u.raw);
+            // Delete from array after use
+            confData.debugMode || console.log(`Traffic reset finish, ready to clean...`);
+            panelUsers.splice(uidpos.uidInList, 1);
+            confData.debugMode || console.log(`Done for ${panelUsers[uidpos].userId}!`);
+        } else {
+            // If non-exists => delete record
+            confData.debugMode || console.log(`User ${u.user.hash} shouldn't be here, ready to clean...`);
+            nodes[node].gRpc.delUser(u.raw);
+            confData.debugMode || console.log(`Done!`);
+        }
     });
 
-}
+    // Report traffic
+    console.log('Reporting traffic...');
+    panel.reportTraffic(nodes[node].panelId, trafficSet);
+
+    // Add new user
+    panelUsers.forEach((u) => {
+        // Not deleted
+        confData.debugMode || console.log(`User ${u.userId} (${u.email}) shown up! Preparing...`);
+        const newUser = {
+            uuid: u.uuid,
+            sha224uuid: u.sha224uuid,
+            speedlimit: u.node_speedlimit,
+            iplimit: u.node_connector
+        };
+        nodes[node].gRpc.addUser(newUser);
+        confData.debugMode || console.log(`Done for ${u.userId}!`);
+    });
+};
 
 /**
  * @method Report load of all nodes - on this server so status are the same
@@ -187,6 +161,6 @@ const reportLoads = () => {
         console.log('Reporting server load...');
         panel.reportNodeLoad(node.panelId, osLoad, upTime);
     });
-}
+};
 
 scheduleReport();

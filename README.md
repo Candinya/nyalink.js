@@ -36,3 +36,7 @@ Inspired by [yahagi.js](https://github.com/trojan-cluster/yahagi.js)
 ## Docker Version
 
 🚧WIP...
+
+## Use static gRPC libs (not fully developed)
+
+1. `grpc_tools_node_protoc --js_out=import_style=es6,binary:./ --grpc_out=./ ./protos/trojan.proto`
