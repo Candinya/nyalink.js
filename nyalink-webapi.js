@@ -31,9 +31,9 @@ export class webApi_SSPanel {
         };
         trafficSet.forEach((u) => {
             const newLog = {
-                'u': u.ul,
-                'd': u.dl,
-                'user_id': u.id,
+                u: u.ul,
+                d: u.dl,
+                user_id: u.id,
             };
             trafficLogSet.data.push(newLog);
         });

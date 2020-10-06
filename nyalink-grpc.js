@@ -62,16 +62,8 @@ export class gRpc_TrojanGo {
                 hash: u.sha224uuid
             },
             trafficTotal: {
-                uploadTraffic: {
-                    high: 0,
-                    low: 0,
-                    unsigned: True
-                },
-                downloadTraffic: {
-                    high: 0,
-                    low: 0,
-                    unsigned: True
-                }
+                uploadTraffic: 0,
+                downloadTraffic: 0
             },
             speedCurrent: {
                 uploadSpeed: 0,
