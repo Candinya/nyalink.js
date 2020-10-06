@@ -39,7 +39,7 @@ confData.nodes.forEach((node) => {
             });
             break;
         default:
-            throw `Backend type ${node.type} not supported yet!`;
+            console.error(`Backend type ${node.type} not supported yet!`);
     }
 });
 console.log(`${nodes.length} nodes initialized!`);
@@ -108,6 +108,8 @@ const backendUserListCallback = (panelUsers, node, backendUserList) => {
     confData.debugMode ? console.log(backendUserList) : {};
     const trafficSet = [];
     console.log('Start checking users...');
+    // Start modifying users -> open a data stream
+    nodes[node].gRpc.modifyUserStart();
     backendUserList.forEach((u) => {
         const uidpos = getUserId(panelUsers, u.sha224uuid);
         if (uidpos.userId !== -1) {
@@ -155,6 +157,8 @@ const backendUserListCallback = (panelUsers, node, backendUserList) => {
         nodes[node].gRpc.addUser(newUser);
         confData.debugMode && console.log(`Done!`);
     });
+    // All done for this node! Close the data stream.
+    nodes[node].gRpc.modifyUserEnd();
 };
 
 /**

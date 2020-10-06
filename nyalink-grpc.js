@@ -11,6 +11,7 @@ const grpc_trojan = grpc.loadPackageDefinition(proto_trojan).trojan.api;
 
 export class gRpc_TrojanGo {
     conn;
+    dataStream;
     constructor(addr, port) {
         this.conn = new grpc_trojan.TrojanServerService(`${addr}:${port}`, grpc.credentials.createInsecure());
         // Or use secure gRPC with certs (WIP...)
@@ -32,49 +33,54 @@ export class gRpc_TrojanGo {
             callBackFunc(panelUsers, node, userList);
         });
     }
+    modifyUserStart() {
+        this.dataStream = this.conn.SetUsers((err, res) => {
+            if (err) {
+                console.error(err);
+            }
+        });
+        this.dataStream.on('data', (res) => {
+            if (!res.success) {
+                console.error(res.info);
+            }
+        });
+    }
+    modifyUser(req) {
+        this.dataStream.write(req);
+    }
+    modifyUserEnd() {
+        this.dataStream.end();
+        this.dataStream.on('end', () => {
+            // User Add / Delete / Modify success
+            console.log('User Add / Delete / Modify success');
+        });
+    }
     addUser(u) {
         const newUser = {
             user: {
                 password: u.uuid,
                 hash: u.sha224uuid
             },
-            traffic_total: {
-                upload_traffic: 0,
-                download_traffic: 0
+            trafficTotal: {
+                uploadTraffic: 0,
+                downloadTraffic: 0
             },
-            speed_current: {
-                upload_speed: 0,
-                download_speed: 0
+            speedCurrent: {
+                uploadSpeed: 0,
+                downloadSpeed: 0
             },
-            speed_limit: {
-                upload_speed: u.speedlimit * 131072, // Trojan-go uses Bps while panel uses Mbps,
-                download_speed: u.speedlimit * 131072 // so just multiply 1024 * 1024 / 8, which means 131,072
+            speedLimit: {
+                uploadSpeed: u.speedlimit * 131072, // Trojan-go uses Bps while panel uses Mbps,
+                downloadSpeed: u.speedlimit * 131072 // so just multiply 1024 * 1024 / 8, which means 131,072
             },
-            ip_current: 0,
-            ip_limit: u.iplimit
+            ipCurrent: 0,
+            ipLimit: u.iplimit
         };
         const req = {
             status: newUser,
             operation: 0 // Add
         };
         this.modifyUser(req);
-    }
-    modifyUser(req) {
-        const dataStream = this.conn.SetUsers((err, res) => {
-            if (err) {
-                throw err;
-            }
-        });
-        dataStream.write(req);
-        dataStream.end();
-        dataStream.on('data', (res) => {
-            if (!res.success) {
-                throw res.info;
-            }
-        });
-        dataStream.on('end', () => {
-            // User Add / Delete / Modify success
-        });
     }
     delUser(uraw) {
         const req = {
