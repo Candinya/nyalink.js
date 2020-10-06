@@ -47,8 +47,8 @@ export class gRpc_TrojanGo {
                 download_speed: 0
             },
             speed_limit: {
-                upload_speed: u.speedlimit,
-                download_speed: u.speedlimit
+                upload_speed: u.speedlimit * 131072, // Trojan-go uses Bps while panel uses Mbps,
+                download_speed: u.speedlimit * 131072 // so just multiply 1024 * 1024 / 8, which means 131,072
             },
             ip_current: 0,
             ip_limit: u.iplimit
