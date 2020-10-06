@@ -1,6 +1,6 @@
 interv: # Event Interval (seconds)
   getUser: 30
-  reportLoads: 15
+  reportLoads: 60
 panel: # Your front-end panel configs
   type: sspanel
   addr: example.com

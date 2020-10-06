@@ -165,7 +165,7 @@ const backendUserListCallback = (panelUsers, node, backendUserList) => {
  * @method Report load of all nodes - on this server so status are the same
  */
 const reportLoads = () => {
-    const osLoad = os.loadavg();
+    const osLoad = os.loadavg()[0];
     const upTime = Math.floor(os.uptime());
     nodes.forEach((node) => {
         console.log('Reporting server load...');
