@@ -23,8 +23,8 @@ export class gRpc_TrojanGo {
             const u = usr.status;
             const beUser = {
                 sha224uuid: u.user.hash,
-                upload: typeof u.trafficTotal.uploadTraffic === "undefined" ? 0 : u.trafficTotal.uploadTraffic,
-                download: typeof u.trafficTotal.downloadTraffic === "undefined" ? 0 : u.trafficTotal.downloadTraffic,
+                upload: typeof u.trafficTotal.uploadTraffic === "undefined" ? 0 : u.trafficTotal.uploadTraffic.toString(),
+                download: typeof u.trafficTotal.downloadTraffic === "undefined" ? 0 : u.trafficTotal.downloadTraffic.toString(),
                 raw: u
             };
             userList.push(beUser);
