@@ -11,7 +11,7 @@ import { gRpc_TrojanGo } from './nyalink-grpc.js';
 // Load configurations
 const confContents = fs.readFileSync('config.yml', 'utf8');
 const confData = yaml.safeLoad(confContents);
-console.log('Config data load successfully...');
+confData.debugMode && console.log('Config data load successfully...');
 confData.debugMode && console.log(confData);
 
 // Define panel webApi constant
@@ -28,7 +28,7 @@ switch (confData.panel.type.toLowerCase()) {
 const nodes = [];
 
 // Initialize servers (use settings in config)
-console.log(`Initializing nodes...`);
+confData.debugMode && console.log(`Initializing nodes...`);
 confData.debugMode && console.log(confData.nodes);
 confData.nodes.forEach((node) => {
     switch (node.type.toLowerCase()) {
@@ -42,7 +42,7 @@ confData.nodes.forEach((node) => {
             console.error(`Backend type ${node.type} not supported yet!`);
     }
 });
-console.log(`${nodes.length} nodes initialized!`);
+confData.debugMode && console.log(`${nodes.length} nodes initialized!`);
 confData.debugMode && console.log(nodes);
 
 // Define core functions
@@ -52,14 +52,14 @@ confData.debugMode && console.log(nodes);
 const scheduleReport = () => {
     setInterval(getUsers, confData.interv.getUser * 1000);
     setInterval(reportLoads, confData.interv.reportLoads * 1000);
-    console.log('Schedule setup.');
+    confData.debugMode && console.log('Schedule setup.');
 };
 
 /**
  * @method Get user list for all nodes
  */
 const getUsers = () => {
-    console.log('Start loading panel users...');
+    confData.debugMode && console.log('Start loading panel users...');
     nodes.forEach((node, no) => {
         panel.getUsers(node.panelId, no, panelUserListCallback);
     });
@@ -90,10 +90,10 @@ const getUserId = (panelUsers, sha224uuid) => {
  * @param node {Int8Array} Node ID in this running progress (NOT in panel)
  */
 const panelUserListCallback = (panelUsers, node) => {
-    console.log('Panel users loaded.');
-    confData.debugMode ? console.log(panelUsers) : {};
+    confData.debugMode && console.log('Panel users loaded.');
+    confData.debugMode && console.log(panelUsers);
     // Get backend users list
-    console.log('Start loading backend users...');
+    confData.debugMode && console.log('Start loading backend users...');
     nodes[node].gRpc.listUsers(panelUsers, node, backendUserListCallback);
 };
 
@@ -104,10 +104,10 @@ const panelUserListCallback = (panelUsers, node) => {
  * @param node {Int8Array} Node ID in this running progress (NOT in panel)
  */
 const backendUserListCallback = (panelUsers, node, backendUserList) => {
-    console.log('Backend users loaded.');
+    confData.debugMode && console.log('Backend users loaded.');
     confData.debugMode ? console.log(backendUserList) : {};
     const trafficSet = [];
-    console.log('Start checking users...');
+    confData.debugMode && console.log('Start checking users...');
     // Start modifying users -> open a data stream
     nodes[node].gRpc.modifyUserStart();
     backendUserList.forEach((u) => {
@@ -140,9 +140,11 @@ const backendUserListCallback = (panelUsers, node, backendUserList) => {
     });
 
     // Report traffic
-    console.log('Reporting traffic...');
-    panel.reportTraffic(nodes[node].panelId, trafficSet);
-    console.log('Traffic reported!');
+    confData.debugMode && console.log('Reporting traffic...');
+    if (trafficSet.length > 0) {
+        panel.reportTraffic(nodes[node].panelId, trafficSet);
+    }
+    confData.debugMode && console.log('Traffic reported!');
 
     // Add new user
     panelUsers.forEach((u) => {
@@ -168,7 +170,7 @@ const reportLoads = () => {
     const osLoad = os.loadavg()[0];
     const upTime = Math.floor(os.uptime());
     nodes.forEach((node) => {
-        console.log('Reporting server load...');
+        confData.debugMode && console.log('Reporting server load...');
         panel.reportNodeLoad(node.panelId, osLoad, upTime);
     });
 };

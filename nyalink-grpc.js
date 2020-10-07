@@ -52,7 +52,7 @@ export class gRpc_TrojanGo {
         this.dataStream.end();
         this.dataStream.on('end', () => {
             // User Add / Delete / Modify success
-            console.log('User Add / Delete / Modify success');
+            // console.log('User Add / Delete / Modify success');
         });
     }
     addUser(u) {

@@ -21,7 +21,7 @@ export class webApi_SSPanel {
                 } else {
                     throw data.data;
                 }
-            }).catch(console.log);
+            }).catch(console.error);
     }
     reportTraffic(panelNodeId, trafficSet) {
         const panelApi = `${this.urlBase}/users/traffic?node_id=${panelNodeId}&key=${this.key}`;
@@ -40,7 +40,7 @@ export class webApi_SSPanel {
 
         got.post(panelApi, {
             json: trafficLogSet
-        }).catch(console.log);
+        }).catch(console.error);
     }
     reportNodeLoad(nodeId, load, uptime) {
         const panelApi = `${this.urlBase}/nodes/${nodeId}/info?key=${this.key}&node_id=${nodeId}`;
@@ -50,6 +50,6 @@ export class webApi_SSPanel {
         };
         got.post(panelApi, {
             json: serverLoad
-        }).catch(console.log);
+        }).catch(console.error);
     }
 }
