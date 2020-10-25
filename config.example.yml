@@ -1,12 +1,12 @@
-debugMode: false
+debugMode: false # Keep this false in production environment.
 interv: # Event Interval (seconds)
   getUser: 30
   reportLoads: 60
 panel: # Your front-end panel configs
-  type: sspanel
+  type: sspanel # Only sspanel is supported now.
   addr: example.com
   key: 123456
-nodes: # Your backend nodes
+nodes: # Your backend nodes.
   - type: trojan
     id: 3
     apiAddr: 127.0.0.1
