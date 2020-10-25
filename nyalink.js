@@ -105,7 +105,7 @@ const panelUserListCallback = (panelUsers, node) => {
  */
 const backendUserListCallback = (panelUsers, node, backendUserList) => {
     confData.debugMode && console.log('Backend users loaded.');
-    confData.debugMode ? console.log(backendUserList) : {};
+    confData.debugMode && console.log(backendUserList);
     const trafficSet = [];
     confData.debugMode && console.log('Start checking users...');
     // Start modifying users -> open a data stream

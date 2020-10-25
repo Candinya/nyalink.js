@@ -16,7 +16,7 @@ export class webApi_SSPanel {
             .then((res) => {
                 return JSON.parse(res.body);
             }).then((data) => {
-                if (data.ret === 1) {
+                if (data.ret === 1 && data.data !== null) {
                     userListCallback(data.data, progNodeId);
                 } else {
                     throw data.data;
